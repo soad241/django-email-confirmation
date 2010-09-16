@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.hashcompat import sha_constructor
 from django.utils.translation import gettext_lazy as _
-
+from django.core.mail import EmailMultiAlternatives
 from emailconfirmation.signals import email_confirmed
 from emailconfirmation.utils import get_send_mail
 send_mail = get_send_mail()
@@ -107,15 +107,22 @@ class EmailConfirmationManager(models.Manager):
             "activate_url": activate_url,
             "current_site": current_site,
             "confirmation_key": confirmation_key,
+            "MEDIA_URL": settings.MEDIA_URL,
         }
         subject = render_to_string(
             "emailconfirmation/email_confirmation_subject.txt", context)
         # remove superfluous line breaks
         subject = "".join(subject.splitlines())
-        message = render_to_string(
+        text_body = render_to_string(
             "emailconfirmation/email_confirmation_message.txt", context)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
-                  [email_address.email], priority="high")
+        text_html = render_to_string(
+            "emailconfirmation/email_confirmation_message.html", context)
+        
+        msg = EmailMultiAlternatives(subject, text_body,
+                                     settings.DEFAULT_FROM_EMAIL,
+                                     [email_address.email])
+        msg.attach_alternative(text_html, "text/html")
+        msg.send()
         return self.create(
             email_address=email_address,
             sent=datetime.now(),
