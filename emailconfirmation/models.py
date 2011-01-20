@@ -43,10 +43,12 @@ class EmailAddressManager(models.Manager):
 
 class EmailAddress(models.Model):
 
+    date = models.DateField(auto_now_add=True)
     user = models.ForeignKey(User)
     email = models.EmailField()
     verified = models.BooleanField(default=False)
     primary = models.BooleanField(default=False)
+    domain = models.CharField(max_length=255)
 
     objects = EmailAddressManager()
 
@@ -65,6 +67,14 @@ class EmailAddress(models.Model):
 
     def __unicode__(self):
         return u"%s (%s)" % (self.email, self.user)
+    
+    def save(self, *args, **kwargs):
+        parts = self.email.split('@')
+        try:
+            self.domain = parts[1]
+        except IndexError:
+            self.domain = ''
+        return super(EmailAddress, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _("e-mail address")
@@ -72,6 +82,7 @@ class EmailAddress(models.Model):
         unique_together = (
             ("user", "email"),
         )
+        
 
 
 class EmailConfirmationManager(models.Manager):
