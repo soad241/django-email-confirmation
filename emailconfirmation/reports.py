@@ -15,8 +15,8 @@ class EmailAddressReport(defreports.Report):
         defreports.BooleanFilter('verified'),
     )
     group_by = defreports.groupbys(
-        'date', 
         'domain', 
+        'date', 
         'verified',
     )
     list_aggregates = defreports.columns(
