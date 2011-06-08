@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from random import random
 
+from django.core.mail.backends.smtp import EmailBackend
 from django.conf import settings
 from django.db import models, IntegrityError
 from django.template.loader import render_to_string
@@ -99,7 +100,15 @@ class EmailConfirmationManager(models.Manager):
             email_address.save()
             email_confirmed.send(sender=self.model, email_address=email_address)
             return email_address
-
+        
+    def get_connection(self):
+        import redisutil
+        if redisutil.acquire_ses_sent_lock():
+            if redisutil.get_num_ses_sent_today() < 1000:
+                redisutil.incr_num_ses_sent_today()
+                return EmailBackend('smtp1.xpsmtp.net', 25)
+        return None
+    
     def send_confirmation(self, email_address):
         salt = sha_constructor(str(random())).hexdigest()[:5]
         confirmation_key = sha_constructor(salt + email_address.email).hexdigest()
@@ -131,7 +140,8 @@ class EmailConfirmationManager(models.Manager):
         
         msg = EmailMultiAlternatives(subject, text_body,
                                      settings.DEFAULT_FROM_EMAIL,
-                                     [email_address.email])
+                                     [email_address.email], 
+                                     connection=self.get_connection())
         msg.attach_alternative(text_html, "text/html")
         msg.send()
         return self.create(
