@@ -8,7 +8,7 @@ def ses_sent_minute_key():
 
 
 def ses_sent_today_key():
-    return "ses_sent:day:{0}".format(format_minute())    
+    return "ses_sent:day:{0}".format(format_date())    
 
 
 def acquire_ses_sent_lock():
