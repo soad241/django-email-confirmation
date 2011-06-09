@@ -20,7 +20,7 @@ def acquire_ses_sent_lock():
 
 
 def get_num_ses_sent_today():
-    return int(connection.get(ses_sent_today_key())) or 0
+    return int(connection.get(ses_sent_today_key()) or 0)
     
         
 def incr_num_ses_sent_today():
