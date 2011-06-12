@@ -104,7 +104,7 @@ class EmailConfirmationManager(models.Manager):
     def get_connection(self):
         import redisutil
         if redisutil.acquire_ses_sent_lock():
-            if redisutil.get_num_ses_sent_today() < 1000:
+            if redisutil.get_num_ses_sent_today() < 3500:
                 redisutil.incr_num_ses_sent_today()
                 return EmailBackend('smtp1.xpsmtp.net', 25)
         return None
