@@ -13,10 +13,11 @@ def ses_sent_today_key():
 
 def acquire_ses_sent_lock():
     key = ses_sent_minute_key()
-    res = connection.setnx(key, 1)
-    if res:
+    val = connection.incr(key, 1)
+    if val <= 3:
         connection.expire(key, 60*20)        
-    return res    
+        return True
+    return False
 
 
 def get_num_ses_sent_today():
