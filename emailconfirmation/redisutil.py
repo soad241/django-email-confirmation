@@ -1,10 +1,11 @@
-from redisconnection.util import get_connection, format_minute, format_date
+from redisconnection.util import get_connection, format_minute, format_date,\
+     format_second
 
 
 connection = get_connection()
 
-def ses_sent_minute_key():
-    return "ses_sent:min:{0}".format(format_minute())    
+def ses_sent_second_key():
+    return "ses_sent:sec:{0}".format(format_second())    
 
 
 def ses_sent_today_key():
@@ -14,7 +15,7 @@ def ses_sent_today_key():
 def acquire_ses_sent_lock():
     key = ses_sent_minute_key()
     val = connection.incr(key, 1)
-    if val <= 6:
+    if val <= 2:
         connection.expire(key, 60*20)        
         return True
     return False
