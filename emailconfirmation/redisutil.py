@@ -15,8 +15,8 @@ def ses_sent_today_key():
 def acquire_ses_sent_lock():
     key = ses_sent_second_key()
     val = connection.incr(key, 1)
+    connection.expire(key, 60*20)        
     if val <= 2:
-        connection.expire(key, 60*20)        
         return True
     return False
 
