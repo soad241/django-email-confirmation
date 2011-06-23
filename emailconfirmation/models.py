@@ -102,6 +102,9 @@ class EmailConfirmationManager(models.Manager):
             return email_address
         
     def get_connection(self):
+        # returning none disables this
+        return None
+    
         import redisutil
         if redisutil.acquire_ses_sent_lock():
             if redisutil.get_num_ses_sent_today() < 10000:
