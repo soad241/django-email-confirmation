@@ -28,3 +28,16 @@ class EmailAddressReport(defreports.Report):
     )
         
 defreports.site.register(EmailAddressReport)
+
+class EmailAddressPctNotice(defreports.Notice):
+    name = 'Email Adress Pct Notices'
+    slug = 'email-address-pct-notices-report'
+    notice_group_by = 'date'
+    notice_group_by_verbose_name = 'Date'
+    notice_field = 'verification_pct'
+    notice_field_verbose_name = 'Verified Pct'
+    change_threshold = 0.1
+    minimum_threshold = 5.0
+    report_type = 'daily'
+    notice_model = models.DaliyMailVerificationStat
+defreports.site.register_daily(EmailAddressPctNotice)

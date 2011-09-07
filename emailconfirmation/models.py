@@ -146,6 +146,7 @@ class EmailConfirmationManager(models.Manager):
                                      [email_address.email], 
                                      connection=self.get_connection())
         msg.attach_alternative(text_html, "text/html")
+        from main.main_redis import XPRedisClient
         msg.send()
         return self.create(
             email_address=email_address,
@@ -177,3 +178,9 @@ class EmailConfirmation(models.Model):
     class Meta:
         verbose_name = _("e-mail confirmation")
         verbose_name_plural = _("e-mail confirmations")
+
+
+class DaliyMailVerificationStat(models.Model):
+    date = models.DateField()
+    created_at = models.DateTimeField()
+    verification_pct = models.FloatField(default=0)
